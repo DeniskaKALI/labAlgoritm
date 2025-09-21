@@ -1,6 +1,7 @@
 import time # O(1)
 import random  # O(1)
 import matplotlib.pyplot as plt # O(1)
+import timeit
 
 
 def linear_search(arr, target):
@@ -38,47 +39,6 @@ def measure_time(func, arr, target, repeat=5):
     return (end - start) / repeat  # O(1)
 
 
-def run_experiments():
-    sizes = [1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000]  # O(1)
-    linear_times = []  # O(1)
-    binary_times = []  # O(1)
-
-    for size in sizes:  # O(len(sizes))
-        arr = list(range(size))  # O(n)
-        target = random.choice([0, size // 2, size - 1, size + 1])  # O(1)
-
-        t_linear = measure_time(linear_search, arr, target)  # O(n)
-        t_binary = measure_time(binary_search, arr, target)  # O(log n)
-
-        linear_times.append(t_linear)  # O(1)
-        binary_times.append(t_binary)  # O(1)
-
-        print(f"Размер: {size}, Linear: {t_linear:.6f}, Binary: {t_binary:.6f}")
-
-    # Построение графика в линейном масштабе
-    plt.figure(figsize=(10, 5))
-    plt.plot(sizes, linear_times, label="Линейный поиск (O(n))")
-    plt.plot(sizes, binary_times, label="Бинарный поиск (O(log n))")
-    plt.xlabel("Размер массива")
-    plt.ylabel("Время (сек.)")
-    plt.title("Сравнение линейного и бинарного поиска")
-    plt.legend()
-    plt.grid(True)
-    plt.show()
-
-    # Построение графика в логарифмическом масштабе
-    plt.figure(figsize=(10, 5))
-    plt.plot(sizes, linear_times, label="Линейный поиск (O(n))")
-    plt.plot(sizes, binary_times, label="Бинарный поиск (O(log n))")
-    plt.xlabel("Размер массива (log scale)")
-    plt.ylabel("Время (сек., log scale)")
-    plt.xscale("log")
-    plt.yscale("log")
-    plt.title("Сравнение в логарифмическом масштабе")
-    plt.legend()
-    plt.grid(True, which="both")
-    plt.show()
-
 
 # Характеристики ПК (замени на свои реальные)
 pc_info = """
@@ -91,5 +51,50 @@ pc_info = """
 
 
 print(pc_info)
-run_experiments()
+# Проведение экспериментов
+sizes = [1000, 5000, 10000, 50000, 100000, 200000]  # Размеры массивов
+linear_times = []
+binary_times = []
+
+print("Замеры времени выполнения поиска:")
+print("{:>10} {:>15} {:>15} {:>15} {:>15}".format(
+    "Размер (N)", "Linear (мс)", "Linear/N (мкс)", "Binary (мс)", "Binary/logN (мкс)"
+))
+
+for size in sizes:
+    arr = list(range(size))
+    target = random.choice([0, size // 2, size - 1, size + 1])  # цель поиска
+
+    # Линейный поиск (усредняем по 10 замерам)
+    linear_time = timeit.timeit(lambda: linear_search(arr, target), number=10) * 1000 / 10
+    linear_times.append(linear_time)
+    time_per_element = (linear_time * 1000) / size if size > 0 else 0  # мкс на элемент
+
+    # Бинарный поиск (усредняем по 10 замерам)
+    binary_time = timeit.timeit(lambda: binary_search(arr, target), number=10) * 1000 / 10
+    binary_times.append(binary_time)
+    time_per_log = (binary_time * 1000) / (size.bit_length())  # мкс на logN
+
+    print("{:>10} {:>15.4f} {:>15.4f} {:>15.4f} {:>15.4f}".format(
+        size, linear_time, time_per_element, binary_time, time_per_log
+    ))
+
+# Построение графика
+plt.figure(figsize=(10, 6))
+plt.plot(sizes, linear_times, 'bo-', label='Линейный поиск O(N)')
+plt.plot(sizes, binary_times, 'ro-', label='Бинарный поиск O(log N)')
+plt.xlabel('Размер массива (N)')
+plt.ylabel('Время выполнения (мс)')
+plt.title('Сравнение времени выполнения линейного и бинарного поиска')
+plt.grid(True, which='both', linestyle='--', linewidth=0.5)
+plt.legend()
+plt.savefig('search_time_plot.png', dpi=300, bbox_inches='tight')
+plt.show()
+
+# Дополнительный анализ
+print("\nАнализ результатов:")
+print("1. Теоретическая сложность линейного поиска: O(N)")
+print("2. Теоретическая сложность бинарного поиска: O(log N)")
+print("3. Практические замеры показывают, что бинарный поиск намного быстрее на больших N.")
+print("4. Время линейного поиска растёт пропорционально N, а бинарного — примерно как log N.")
 
