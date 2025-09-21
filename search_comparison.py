@@ -1,3 +1,5 @@
+import time
+
 def linear_search(arr, target):
     """
     Линейный поиск элемента в массиве.
@@ -34,3 +36,13 @@ def binary_search(arr, target):
 print(binary_search(test_arr, 30))  # ожидается 2
 print(binary_search(test_arr, 50))  # ожидается 4
 print(binary_search(test_arr, 99))  # ожидается -1
+
+def measure_time(func, arr, target, repeat=5):
+    """
+    Замеряет среднее время выполнения функции поиска.
+    """
+    start = time.perf_counter()  # O(1)
+    for _ in range(repeat):  # O(repeat)
+        func(arr, target)  # O(n) или O(log n)
+    end = time.perf_counter()  # O(1)
+    return (end - start) / repeat  # O(1)
