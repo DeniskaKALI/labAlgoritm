@@ -13,3 +13,24 @@ print("Тест линейного поиска:")
 print(linear_search(test_arr, 30))  # ожидается 2
 print(linear_search(test_arr, 50))  # ожидается 4
 print(linear_search(test_arr, 99))  # ожидается -1
+
+def binary_search(arr, target):
+    """
+    Бинарный поиск элемента в отсортированном массиве.
+    Сложность: O(log n)
+    """
+    left, right = 0, len(arr) - 1  # O(1)
+    while left <= right:           # O(log n)
+        mid = (left + right) // 2  # O(1)
+        if arr[mid] == target:     # O(1)
+            return mid
+        elif arr[mid] < target:    # O(1)
+            left = mid + 1
+        else:
+            right = mid - 1
+    return -1
+
+
+print(binary_search(test_arr, 30))  # ожидается 2
+print(binary_search(test_arr, 50))  # ожидается 4
+print(binary_search(test_arr, 99))  # ожидается -1
